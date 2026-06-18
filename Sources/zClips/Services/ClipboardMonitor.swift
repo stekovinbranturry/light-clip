@@ -62,11 +62,14 @@ final class ClipboardMonitor {
 
         if let image = NSImage(pasteboard: pasteboard),
            let pngData = image.pngData {
+            let bitmap = NSBitmapImageRep(data: pngData)
             return ClipboardItem(
                 id: UUID(),
                 kind: .image,
                 text: nil,
                 imageData: pngData,
+                imagePixelWidth: bitmap?.pixelsWide,
+                imagePixelHeight: bitmap?.pixelsHigh,
                 createdAt: Date()
             )
         }

@@ -11,6 +11,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
     let kind: Kind
     var text: String?
     var imageData: Data?
+    var imagePixelWidth: Int?
+    var imagePixelHeight: Int?
     var filePaths: [String]
     var isFavorite: Bool
     let createdAt: Date
@@ -20,6 +22,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
         kind: Kind,
         text: String? = nil,
         imageData: Data? = nil,
+        imagePixelWidth: Int? = nil,
+        imagePixelHeight: Int? = nil,
         filePaths: [String] = [],
         isFavorite: Bool = false,
         createdAt: Date
@@ -28,6 +32,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
         self.kind = kind
         self.text = text
         self.imageData = imageData
+        self.imagePixelWidth = imagePixelWidth
+        self.imagePixelHeight = imagePixelHeight
         self.filePaths = filePaths
         self.isFavorite = isFavorite
         self.createdAt = createdAt
@@ -39,6 +45,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
         kind = try container.decode(Kind.self, forKey: .kind)
         text = try container.decodeIfPresent(String.self, forKey: .text)
         imageData = try container.decodeIfPresent(Data.self, forKey: .imageData)
+        imagePixelWidth = try container.decodeIfPresent(Int.self, forKey: .imagePixelWidth)
+        imagePixelHeight = try container.decodeIfPresent(Int.self, forKey: .imagePixelHeight)
         filePaths = try container.decodeIfPresent([String].self, forKey: .filePaths) ?? []
         isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         createdAt = try container.decode(Date.self, forKey: .createdAt)
@@ -49,6 +57,8 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
         case kind
         case text
         case imageData
+        case imagePixelWidth
+        case imagePixelHeight
         case filePaths
         case isFavorite
         case createdAt

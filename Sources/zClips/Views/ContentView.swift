@@ -157,7 +157,11 @@ private struct ClipboardFilterBar: View {
             HStack(spacing: 18) {
                 ForEach(ClipboardFilter.allCases) { option in
                     Button {
-                        filter = option
+                        var transaction = Transaction()
+                        transaction.disablesAnimations = true
+                        withTransaction(transaction) {
+                            filter = option
+                        }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: option.systemImage)
@@ -166,15 +170,18 @@ private struct ClipboardFilterBar: View {
                                 .font(.system(size: 13, weight: .semibold))
                         }
                         .foregroundStyle(filter == option ? Color.black : Color.black.opacity(0.58))
-                        .frame(minWidth: 86, minHeight: 34)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
                         .background {
                             if filter == option {
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: 10)
                                     .fill(Color.black.opacity(0.045))
                             }
                         }
+                        .contentShape(RoundedRectangle(cornerRadius: 10))
                     }
                     .buttonStyle(.plain)
+                    .frame(width: option == .favorite ? 130 : 112)
                     .pointingHandCursor()
                 }
 
@@ -219,9 +226,9 @@ private struct ClipboardFilterBar: View {
             .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 6))
         }
         .foregroundStyle(Color.black.opacity(0.58))
-        .padding(.horizontal, 8)
-        .padding(.top, 2)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 26)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
         .background(Color.white)
     }
 }
@@ -338,7 +345,7 @@ private struct ClipboardListItem: View {
                     .foregroundStyle(Color.black.opacity(0.46))
                     .frame(width: 62, alignment: .leading)
 
-                if let image = item.nsImage {
+                if let image = item.thumbnailImage {
                     Button(action: onPreview) {
                         Image(nsImage: image)
                             .resizable()
@@ -397,9 +404,9 @@ private struct EmptyHistoryView: View {
 }
 
 private extension ClipboardItem {
-    var nsImage: NSImage? {
+    var thumbnailImage: NSImage? {
         guard let imageData else { return nil }
-        return NSImage(data: imageData)
+        return ImageThumbnailCache.shared.thumbnail(for: id, data: imageData)
     }
 
     var textPreview: String {
@@ -412,11 +419,13 @@ private extension ClipboardItem {
         case .text:
             return "\(text?.count ?? 0) 字符"
         case .image:
-            guard let image = nsImage,
-                  let representation = image.representations.first else {
+            if let imagePixelWidth, let imagePixelHeight {
+                return "\(imagePixelWidth) x \(imagePixelHeight)"
+            }
+            guard let size = ImageThumbnailCache.shared.pixelSize(for: id, data: imageData) else {
                 return "图像"
             }
-            return "\(representation.pixelsWide) x \(representation.pixelsHigh)"
+            return "\(size.width) x \(size.height)"
         case .file:
             return filePaths.count == 1 ? "1 个文件" : "\(filePaths.count) 个文件"
         }
@@ -456,5 +465,50 @@ private extension View {
                 NSCursor.pop()
             }
         }
+    }
+}
+
+private final class ImageThumbnailCache {
+    static let shared = ImageThumbnailCache()
+
+    private let imageCache = NSCache<NSString, NSImage>()
+    private var sizeCache: [UUID: (width: Int, height: Int)] = [:]
+
+    func thumbnail(for id: UUID, data: Data) -> NSImage? {
+        let key = id.uuidString as NSString
+        if let cached = imageCache.object(forKey: key) {
+            return cached
+        }
+
+        guard let source = NSImage(data: data) else { return nil }
+        if let representation = source.representations.first {
+            sizeCache[id] = (width: representation.pixelsWide, height: representation.pixelsHigh)
+        }
+
+        let maxSize = NSSize(width: 260, height: 118)
+        let sourceSize = source.size
+        guard sourceSize.width > 0, sourceSize.height > 0 else { return source }
+
+        let ratio = min(maxSize.width / sourceSize.width, maxSize.height / sourceSize.height, 1)
+        let targetSize = NSSize(width: sourceSize.width * ratio, height: sourceSize.height * ratio)
+        let thumbnail = NSImage(size: targetSize)
+        thumbnail.lockFocus()
+        source.draw(in: NSRect(origin: .zero, size: targetSize))
+        thumbnail.unlockFocus()
+
+        imageCache.setObject(thumbnail, forKey: key)
+        return thumbnail
+    }
+
+    func pixelSize(for id: UUID, data: Data?) -> (width: Int, height: Int)? {
+        if let cached = sizeCache[id] {
+            return cached
+        }
+        guard let data, let bitmap = NSBitmapImageRep(data: data) else {
+            return nil
+        }
+        let size = (width: bitmap.pixelsWide, height: bitmap.pixelsHigh)
+        sizeCache[id] = size
+        return size
     }
 }
