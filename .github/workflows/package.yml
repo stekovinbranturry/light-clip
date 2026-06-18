@@ -1,0 +1,33 @@
+name: Package macOS App
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: Build and package ClipVault
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Build app archive
+        run: ./script/package_app.sh release
+
+      - name: Upload app zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClipVault-macOS-${{ github.sha }}
+          path: dist/ClipVault-macOS.zip
+          if-no-files-found: error
