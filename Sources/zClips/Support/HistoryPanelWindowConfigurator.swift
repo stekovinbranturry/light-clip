@@ -54,7 +54,7 @@ struct HistoryPanelWindowConfigurator: NSViewRepresentable {
             window.collectionBehavior.insert(.moveToActiveSpace)
             window.backgroundColor = .white
             window.hasShadow = true
-            window.setContentSize(NSSize(width: 560, height: 420))
+            window.setContentSize(NSSize(width: 780, height: 540))
             window.center()
 
             resignObserver = NotificationCenter.default.addObserver(

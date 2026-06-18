@@ -40,7 +40,7 @@ struct zClipsApp: App {
 
         Window("zClips History", id: "history") {
             ContentView(store: store)
-                .frame(minWidth: 520, minHeight: 380)
+                .frame(width: 780, height: 540)
                 .background(HistoryPanelWindowConfigurator())
                 .onAppear {
                     store.startMonitoring()

@@ -29,70 +29,74 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ClipboardFilterBar(
-                filter: $filter,
-                searchText: $searchText,
-                isSearchFocused: $isSearchFocused,
-                favoriteCount: store.items.filter(\.isFavorite).count
-            )
+        ZStack(alignment: .top) {
+            Color.white
 
-            Rectangle()
-                .fill(Color.black.opacity(0.12))
-                .frame(height: 1)
+            VStack(spacing: 0) {
+                ClipboardFilterBar(
+                    filter: $filter,
+                    searchText: $searchText,
+                    isSearchFocused: $isSearchFocused,
+                    favoriteCount: store.items.filter(\.isFavorite).count
+                )
 
-            if visibleItems.isEmpty {
-                EmptyHistoryView(filter: filter)
-            } else {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(Array(visibleItems.enumerated()), id: \.element.id) { index, item in
-                                ClipboardListItem(
-                                    item: item,
-                                    number: index + 1,
-                                    isSelected: store.selectedItemID == item.id,
-                                    onSelect: {
-                                        store.selectedItemID = item.id
-                                    },
-                                    onCopy: {
-                                        store.selectedItemID = item.id
-                                        store.copyToPasteboard(item)
-                                    },
-                                    onPreview: {
-                                        store.selectedItemID = item.id
-                                        store.previewImage(item)
-                                    },
-                                    onToggleFavorite: {
-                                        store.toggleFavorite(item)
-                                    },
-                                    onDelete: {
-                                        store.delete(item)
-                                    }
-                                )
-                                .id(item.id)
+                Rectangle()
+                    .fill(Color.black.opacity(0.12))
+                    .frame(height: 1)
+
+                if visibleItems.isEmpty {
+                    EmptyHistoryView(filter: filter)
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(spacing: 0) {
+                                ForEach(Array(visibleItems.enumerated()), id: \.element.id) { index, item in
+                                    ClipboardListItem(
+                                        item: item,
+                                        number: index + 1,
+                                        isSelected: store.selectedItemID == item.id,
+                                        onSelect: {
+                                            store.selectedItemID = item.id
+                                        },
+                                        onCopy: {
+                                            store.selectedItemID = item.id
+                                            store.copyToPasteboard(item)
+                                        },
+                                        onPreview: {
+                                            store.selectedItemID = item.id
+                                            store.previewImage(item)
+                                        },
+                                        onToggleFavorite: {
+                                            store.toggleFavorite(item)
+                                        },
+                                        onDelete: {
+                                            store.delete(item)
+                                        }
+                                    )
+                                    .id(item.id)
+                                }
                             }
                         }
-                    }
-                    .background(Color.white)
-                    .onAppear {
-                        showInitialLatestItemIfNeeded(using: proxy)
-                    }
-                    .onChange(of: store.items.first?.id) { _ in
-                        scrollToLatestItemIfAppropriate(using: proxy)
+                        .background(Color.white)
+                        .onAppear {
+                            showInitialLatestItemIfNeeded(using: proxy)
+                        }
+                        .onChange(of: store.items.first?.id) { _ in
+                            scrollToLatestItemIfAppropriate(using: proxy)
+                        }
                     }
                 }
             }
+            .frame(maxWidth: 880, maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, 28)
+            .padding(.top, 34)
+            .padding(.bottom, 18)
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 22)
-        .padding(.bottom, 18)
         .background(Color.white)
         .onReceive(NotificationCenter.default.publisher(for: .focusClipboardSearch)) { _ in
             isSearchFocused = true
         }
     }
-
     private func showInitialLatestItemIfNeeded(using proxy: ScrollViewProxy) {
         guard !didShowInitialLatestItem else { return }
         didShowInitialLatestItem = true
@@ -226,7 +230,6 @@ private struct ClipboardFilterBar: View {
             .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 6))
         }
         .foregroundStyle(Color.black.opacity(0.58))
-        .padding(.horizontal, 26)
         .padding(.top, 12)
         .padding(.bottom, 14)
         .background(Color.white)
