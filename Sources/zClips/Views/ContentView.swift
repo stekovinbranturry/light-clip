@@ -5,6 +5,7 @@ struct ContentView: View {
     @ObservedObject var store: ClipboardStore
     @State private var filter: ClipboardFilter = .all
     @State private var searchText = ""
+    @State private var didShowInitialLatestItem = false
     @FocusState private var isSearchFocused: Bool
 
     private var visibleItems: [ClipboardItem] {
@@ -75,28 +76,39 @@ struct ContentView: View {
                     }
                     .background(Color.white)
                     .onAppear {
-                        showLatestItem(using: proxy)
+                        showInitialLatestItemIfNeeded(using: proxy)
                     }
                     .onChange(of: store.items.first?.id) { _ in
-                        showLatestItem(using: proxy)
+                        scrollToLatestItemIfAppropriate(using: proxy)
                     }
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 24)
+        .padding(.top, 22)
+        .padding(.bottom, 18)
         .background(Color.white)
         .onReceive(NotificationCenter.default.publisher(for: .focusClipboardSearch)) { _ in
             isSearchFocused = true
         }
     }
 
-    private func showLatestItem(using proxy: ScrollViewProxy) {
+    private func showInitialLatestItemIfNeeded(using proxy: ScrollViewProxy) {
+        guard !didShowInitialLatestItem else { return }
+        didShowInitialLatestItem = true
         guard searchText.isEmpty else { return }
         filter = .all
         store.selectLatestItem()
+        scrollToLatestItem(using: proxy)
+    }
 
+    private func scrollToLatestItemIfAppropriate(using proxy: ScrollViewProxy) {
+        guard filter == .all, searchText.isEmpty else { return }
+        store.selectLatestItem()
+        scrollToLatestItem(using: proxy)
+    }
+
+    private func scrollToLatestItem(using proxy: ScrollViewProxy) {
         guard let latestID = store.items.first?.id else { return }
         DispatchQueue.main.async {
             proxy.scrollTo(latestID, anchor: .top)
@@ -163,6 +175,7 @@ private struct ClipboardFilterBar: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                 }
 
                 Spacer()
@@ -174,6 +187,7 @@ private struct ClipboardFilterBar: View {
                         .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
+                .pointingHandCursor()
                 .help("刷新")
             }
 
@@ -196,6 +210,7 @@ private struct ClipboardFilterBar: View {
                             .foregroundStyle(Color.black.opacity(0.34))
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                     .help("清空搜索")
                 }
             }
@@ -204,8 +219,9 @@ private struct ClipboardFilterBar: View {
             .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 6))
         }
         .foregroundStyle(Color.black.opacity(0.58))
+        .padding(.horizontal, 8)
         .padding(.top, 2)
-        .padding(.bottom, 8)
+        .padding(.bottom, 10)
         .background(Color.white)
     }
 }
@@ -244,6 +260,7 @@ private struct ClipboardListItem: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
             .help(item.isFavorite ? "取消收藏" : "收藏")
 
             Button(action: onCopy) {
@@ -254,9 +271,10 @@ private struct ClipboardListItem: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
             .help("复制")
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 22)
         .padding(.vertical, item.kind == .image ? 8 : 9)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
@@ -275,6 +293,7 @@ private struct ClipboardListItem: View {
         }
         .contentShape(Rectangle())
         .onTapGesture(perform: onSelect)
+        .pointingHandCursor()
         .contextMenu {
             Button("Copy") {
                 onCopy()
@@ -331,6 +350,7 @@ private struct ClipboardListItem: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                     .help("预览")
                 }
             }
@@ -423,6 +443,18 @@ private extension ClipboardItem {
 
         return tokens.contains { token in
             token.localizedCaseInsensitiveContains(query)
+        }
+    }
+}
+
+private extension View {
+    func pointingHandCursor() -> some View {
+        onHover { isHovering in
+            if isHovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
         }
     }
 }
