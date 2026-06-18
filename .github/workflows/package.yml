@@ -8,6 +8,9 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   package:
     name: Build and package zClips
@@ -22,12 +25,35 @@ jobs:
           swift --version
           xcodebuild -version
 
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" == v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="$(tr -d '[:space:]' < VERSION)"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "zip=dist/zClips-v${VERSION}-macOS.zip" >> "$GITHUB_OUTPUT"
+
       - name: Build app archive
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: ./script/package_app.sh release
 
       - name: Upload app zip
         uses: actions/upload-artifact@v4
         with:
-          name: zClips-macOS-${{ github.sha }}
-          path: dist/zClips-macOS.zip
+          name: zClips-v${{ steps.version.outputs.version }}-macOS
+          path: ${{ steps.version.outputs.zip }}
           if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: zClips v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: ${{ steps.version.outputs.zip }}
