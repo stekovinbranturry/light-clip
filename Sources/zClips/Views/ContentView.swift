@@ -65,9 +65,9 @@ struct ContentView: View {
                                     onToggleFavorite: {
                                         store.toggleFavorite(item)
                                     },
-                                onDelete: {
-                                    store.delete(item)
-                                }
+                                    onDelete: {
+                                        store.delete(item)
+                                    }
                                 )
                                 .id(item.id)
                             }
@@ -83,6 +83,9 @@ struct ContentView: View {
                 }
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 10)
         .background(Color.white)
         .onReceive(NotificationCenter.default.publisher(for: .focusClipboardSearch)) { _ in
             isSearchFocused = true
@@ -201,9 +204,8 @@ private struct ClipboardFilterBar: View {
             .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 6))
         }
         .foregroundStyle(Color.black.opacity(0.58))
-        .padding(.horizontal, 12)
-        .padding(.top, 7)
-        .padding(.bottom, 5)
+        .padding(.top, 2)
+        .padding(.bottom, 8)
         .background(Color.white)
     }
 }
@@ -265,7 +267,7 @@ private struct ClipboardListItem: View {
                         RoundedRectangle(cornerRadius: 6)
                             .stroke(Color(red: 0.34, green: 0.42, blue: 1.0), lineWidth: 2)
                     }
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 2)
                     .padding(.vertical, 3)
             } else {
                 Color.white
@@ -293,6 +295,7 @@ private struct ClipboardListItem: View {
         Divider()
             .overlay(Color.black.opacity(0.11))
             .padding(.leading, 18)
+            .padding(.trailing, 8)
     }
 
     @ViewBuilder
