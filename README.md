@@ -22,7 +22,7 @@ zClips 是一个简洁的 macOS 状态栏剪贴板工具，用来找回最近复
 
 在 Releases 页面下载最新版：
 
-[下载 zClips](https://github.com/stekovinbranturry/light-clip/releases)
+[下载 zClips](https://github.com/stekovinbranturry/zClips/releases)
 
 安装包命名示例：
 
