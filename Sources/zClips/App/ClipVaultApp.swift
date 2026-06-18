@@ -31,7 +31,7 @@ struct zClipsApp: App {
                     store.startMonitoring()
                 }
         } label: {
-            Label("zClips", systemImage: "doc.on.clipboard")
+            StatusBarIconView()
                 .onReceive(NotificationCenter.default.publisher(for: .showHistoryWindow)) { _ in
                     showHistoryWindow()
                 }
@@ -74,5 +74,32 @@ struct zClipsApp: App {
         store.selectLatestItem()
         openWindow(id: "history")
         NSApp.activate(ignoringOtherApps: true)
+    }
+}
+
+private struct StatusBarIconView: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 3.4, style: .continuous)
+                .stroke(.primary, lineWidth: 1.65)
+                .frame(width: 17, height: 17)
+
+            ZMark()
+                .stroke(.primary, style: StrokeStyle(lineWidth: 2.05, lineCap: .round, lineJoin: .round))
+                .frame(width: 10, height: 10)
+        }
+        .frame(width: 22, height: 18)
+        .accessibilityLabel("zClips")
+    }
+}
+
+private struct ZMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY + rect.height * 0.12))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + rect.height * 0.12))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - rect.height * 0.12))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - rect.height * 0.12))
+        return path
     }
 }
