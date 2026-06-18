@@ -33,7 +33,7 @@ struct StatusMenuView: View {
 
         Divider()
 
-        Button("Quit ClipVault") {
+        Button("Quit zClips") {
             NSApplication.shared.terminate(nil)
         }
         .keyboardShortcut("q")

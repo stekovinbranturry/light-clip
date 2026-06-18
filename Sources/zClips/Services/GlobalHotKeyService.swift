@@ -3,8 +3,8 @@ import Carbon
 import Foundation
 
 extension Notification.Name {
-    static let showHistoryWindow = Notification.Name("ClipVaultShowHistoryWindow")
-    static let focusClipboardSearch = Notification.Name("ClipVaultFocusClipboardSearch")
+    static let showHistoryWindow = Notification.Name("zClipsShowHistoryWindow")
+    static let focusClipboardSearch = Notification.Name("zClipsFocusClipboardSearch")
 }
 
 final class GlobalHotKeyService {

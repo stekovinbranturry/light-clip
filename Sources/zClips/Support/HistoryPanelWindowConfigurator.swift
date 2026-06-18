@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 enum HistoryPanelWindowController {
-    static let title = "Clipboard History"
+    static let title = "zClips History"
 
     static var isHistoryWindowVisible: Bool {
         NSApp.windows.contains { window in

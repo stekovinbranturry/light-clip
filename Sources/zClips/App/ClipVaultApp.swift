@@ -19,7 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 @main
-struct ClipVaultApp: App {
+struct zClipsApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.openWindow) private var openWindow
     @StateObject private var store = ClipboardStore()
@@ -31,14 +31,14 @@ struct ClipVaultApp: App {
                     store.startMonitoring()
                 }
         } label: {
-            Label("ClipVault", systemImage: "doc.on.clipboard")
+            Label("zClips", systemImage: "doc.on.clipboard")
                 .onReceive(NotificationCenter.default.publisher(for: .showHistoryWindow)) { _ in
                     showHistoryWindow()
                 }
         }
         .menuBarExtraStyle(.menu)
 
-        Window("Clipboard History", id: "history") {
+        Window("zClips History", id: "history") {
             ContentView(store: store)
                 .frame(minWidth: 520, minHeight: 380)
                 .background(HistoryPanelWindowConfigurator())

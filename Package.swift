@@ -3,17 +3,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "ClipVault",
+    name: "zClips",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "ClipVault", targets: ["ClipVault"])
+        .executable(name: "zClips", targets: ["zClips"])
     ],
     targets: [
         .executableTarget(
-            name: "ClipVault",
-            path: "Sources/ClipVault"
+            name: "zClips",
+            path: "Sources/zClips"
         )
     ]
 )

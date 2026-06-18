@@ -14,7 +14,7 @@ final class ClipboardStore: ObservableObject {
         let supportDirectory = FileManager.default.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask
-        )[0].appendingPathComponent("ClipVault", isDirectory: true)
+        )[0].appendingPathComponent("zClips", isDirectory: true)
 
         self.persistenceURL = supportDirectory.appendingPathComponent("history.json")
         load()
@@ -64,7 +64,7 @@ final class ClipboardStore: ObservableObject {
 
         do {
             let directory = FileManager.default.temporaryDirectory
-                .appendingPathComponent("ClipVaultPreviews", isDirectory: true)
+                .appendingPathComponent("zClipsPreviews", isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 
             let url = directory.appendingPathComponent("\(item.id.uuidString).png")
