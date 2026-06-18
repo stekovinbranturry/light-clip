@@ -88,9 +88,9 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: 880, maxHeight: .infinity, alignment: .top)
-            .padding(.horizontal, 28)
-            .padding(.top, 34)
-            .padding(.bottom, 18)
+            .padding(.horizontal, 18)
+            .padding(.top, 6)
+            .padding(.bottom, 14)
         }
         .background(Color.white)
         .onReceive(NotificationCenter.default.publisher(for: .focusClipboardSearch)) { _ in
@@ -158,7 +158,7 @@ private struct ClipboardFilterBar: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            HStack(spacing: 18) {
+            HStack(spacing: 14) {
                 ForEach(ClipboardFilter.allCases) { option in
                     Button {
                         var transaction = Transaction()
@@ -175,7 +175,7 @@ private struct ClipboardFilterBar: View {
                         }
                         .foregroundStyle(filter == option ? Color.black : Color.black.opacity(0.58))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, 8)
                         .background {
                             if filter == option {
                                 RoundedRectangle(cornerRadius: 10)
@@ -185,7 +185,7 @@ private struct ClipboardFilterBar: View {
                         .contentShape(RoundedRectangle(cornerRadius: 10))
                     }
                     .buttonStyle(.plain)
-                    .frame(width: option == .favorite ? 130 : 112)
+                    .frame(width: option == .favorite ? 118 : 98)
                     .pointingHandCursor()
                 }
 
@@ -230,8 +230,8 @@ private struct ClipboardFilterBar: View {
             .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 6))
         }
         .foregroundStyle(Color.black.opacity(0.58))
-        .padding(.top, 12)
-        .padding(.bottom, 14)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
         .background(Color.white)
     }
 }
@@ -284,7 +284,7 @@ private struct ClipboardListItem: View {
             .pointingHandCursor()
             .help("复制")
         }
-        .padding(.horizontal, 22)
+        .padding(.horizontal, 18)
         .padding(.vertical, item.kind == .image ? 8 : 9)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
