@@ -1,6 +1,12 @@
+<p align="center">
+  <img src="docs/assets/zclips-logo.png" width="96" alt="zClips Logo">
+</p>
+
 # zClips
 
 zClips 是一个简洁的 macOS 状态栏剪贴板工具，用来找回最近复制过的内容。
+
+![zClips 产品截图](docs/assets/zclips-screenshot.png)
 
 ## 功能
 
@@ -21,7 +27,7 @@ zClips 是一个简洁的 macOS 状态栏剪贴板工具，用来找回最近复
 安装包命名示例：
 
 ```text
-zClips-v0.1.0-macOS.zip
+zClips-v0.1.1-macOS.zip
 ```
 
 ## 本地打包

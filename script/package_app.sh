@@ -6,6 +6,7 @@ APP_NAME="zClips"
 BUNDLE_ID="com.stekovinbranturry.zClips"
 MIN_SYSTEM_VERSION="13.0"
 ICON_FILE="AppIcon.icns"
+STATUS_ICON_FILE="StatusBarIconTemplate.png"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION_FILE="$ROOT_DIR/VERSION"
@@ -46,6 +47,7 @@ mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
 cp "$ROOT_DIR/Assets/$ICON_FILE" "$APP_RESOURCES/$ICON_FILE"
+cp "$ROOT_DIR/Assets/$STATUS_ICON_FILE" "$APP_RESOURCES/$STATUS_ICON_FILE"
 
 cat >"$INFO_PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

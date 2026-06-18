@@ -11,7 +11,13 @@ final class GlobalHotKeyService {
     private var hotKeyRef: EventHotKeyRef?
     private var eventHandlerRef: EventHandlerRef?
 
-    func registerOptionSpace() {
+    func registerSavedShortcut() {
+        register(HotKeyShortcut.saved)
+    }
+
+    func register(_ shortcut: HotKeyShortcut) {
+        unregister()
+
         var eventType = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
             eventKind: UInt32(kEventHotKeyPressed)
@@ -57,8 +63,8 @@ final class GlobalHotKeyService {
         )
 
         let registerStatus = RegisterEventHotKey(
-            UInt32(kVK_Space),
-            UInt32(optionKey),
+            shortcut.keyCode,
+            shortcut.modifiers,
             hotKeyID,
             GetApplicationEventTarget(),
             0,

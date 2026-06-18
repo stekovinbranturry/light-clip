@@ -3,13 +3,24 @@ import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let hotKeyService = GlobalHotKeyService()
+    private var hotKeyObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        hotKeyService.registerOptionSpace()
+        hotKeyService.registerSavedShortcut()
+        hotKeyObserver = NotificationCenter.default.addObserver(
+            forName: .hotKeyShortcutDidChange,
+            object: nil,
+            queue: .main
+        ) { [hotKeyService] _ in
+            hotKeyService.registerSavedShortcut()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        if let hotKeyObserver {
+            NotificationCenter.default.removeObserver(hotKeyObserver)
+        }
         hotKeyService.unregister()
     }
 
@@ -47,6 +58,12 @@ struct zClipsApp: App {
                 }
         }
         .windowResizability(.contentSize)
+
+        Window("偏好设置", id: "preferences") {
+            PreferencesView()
+                .frame(width: 520, height: 260)
+        }
+        .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .pasteboard) {
                 Button("Copy") {
@@ -79,27 +96,26 @@ struct zClipsApp: App {
 
 private struct StatusBarIconView: View {
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 3.4, style: .continuous)
-                .stroke(.primary, lineWidth: 1.65)
-                .frame(width: 17, height: 17)
-
-            ZMark()
-                .stroke(.primary, style: StrokeStyle(lineWidth: 2.05, lineCap: .round, lineJoin: .round))
-                .frame(width: 10, height: 10)
-        }
-        .frame(width: 22, height: 18)
-        .accessibilityLabel("zClips")
+        Image(nsImage: .statusBarIcon)
+            .resizable()
+            .interpolation(.high)
+            .frame(width: 19, height: 19)
+            .frame(width: 22, height: 18)
+            .accessibilityLabel("zClips")
     }
 }
 
-private struct ZMark: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY + rect.height * 0.12))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + rect.height * 0.12))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - rect.height * 0.12))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - rect.height * 0.12))
-        return path
+private extension NSImage {
+    static var statusBarIcon: NSImage {
+        if let image = NSImage(named: "StatusBarIconTemplate") {
+            image.isTemplate = true
+            image.size = NSSize(width: 19, height: 19)
+            return image
+        }
+
+        let fallback = NSImage(systemSymbolName: "z.square", accessibilityDescription: "zClips") ?? NSImage()
+        fallback.isTemplate = true
+        fallback.size = NSSize(width: 19, height: 19)
+        return fallback
     }
 }

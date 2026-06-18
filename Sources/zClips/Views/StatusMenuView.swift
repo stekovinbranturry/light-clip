@@ -4,6 +4,7 @@ import SwiftUI
 struct StatusMenuView: View {
     @ObservedObject var store: ClipboardStore
     @Environment(\.openWindow) private var openWindow
+    @State private var shortcut = HotKeyShortcut.saved
 
     @ViewBuilder
     var body: some View {
@@ -22,8 +23,13 @@ struct StatusMenuView: View {
 
         Divider()
 
-        Button("Open History    ⌥ Space") {
+        Button("Open History    \(shortcut.displayText)") {
             openHistoryWindow()
+        }
+
+        Button("Preferences...") {
+            openWindow(id: "preferences")
+            NSApp.activate(ignoringOtherApps: true)
         }
 
         Button("Clear History", role: .destructive) {
@@ -37,6 +43,9 @@ struct StatusMenuView: View {
             NSApplication.shared.terminate(nil)
         }
         .keyboardShortcut("q")
+        .onReceive(NotificationCenter.default.publisher(for: .hotKeyShortcutDidChange)) { _ in
+            shortcut = HotKeyShortcut.saved
+        }
     }
 
     private func openHistoryWindow() {
